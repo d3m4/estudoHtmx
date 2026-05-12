@@ -50,3 +50,21 @@ def index(request: Request):
         "total_pages": total_pages,
     }
     return _render("layout.html", request, ctx)
+
+
+@app.get("/expenses", response_class=HTMLResponse)
+def list_expenses(request: Request, page: int = 1):
+    """Fragmento da lista paginada."""
+    if page < 1:
+        page = 1
+    total_pages = repository.total_pages()
+    if page > total_pages:
+        page = total_pages
+    expenses = repository.list_page(page)
+    ctx = {
+        "expenses": expenses,
+        "page": page,
+        "total_pages": total_pages,
+        "is_oob": False,
+    }
+    return _render("list.html", request, ctx)
