@@ -1,0 +1,35 @@
+# banco compartilhado em runtime
+shared/expenses.db
+shared/expenses.db-shm
+shared/expenses.db-wal
+
+# .net
+**/bin/
+**/obj/
+*.user
+
+# go
+**/*.exe
+**/*.test
+**/*.out
+
+# python
+**/__pycache__/
+**/*.pyc
+**/.venv/
+**/venv/
+
+# node
+**/node_modules/
+**/dist/
+**/.next/
+
+# rust
+**/target/
+
+# editores / so
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
