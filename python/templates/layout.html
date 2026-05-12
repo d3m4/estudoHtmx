@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>estudoHtmx — python</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+    .negativo { color: var(--pico-color-red-500, #c0392b); }
+    .acoes button { padding: 0.25rem 0.5rem; margin: 0 0.1rem; }
+    .pagination { display: flex; gap: 0.25rem; justify-content: center; align-items: center; margin-top: 1rem; }
+    .pagination button { padding: 0.25rem 0.6rem; }
+    .pagination .pag-info { padding: 0 0.5rem; }
+    small.error { color: var(--pico-color-red-500, #c0392b); display: block; margin-top: 0.25rem; }
+    small.hint { color: var(--pico-muted-color, #6c757d); display: block; margin-top: 0.25rem; }
+    td.truncate { max-width: 18rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    main.container { max-width: 960px; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <hgroup>
+      <h1>despesas</h1>
+      <p>estudoHtmx — backend python (fastapi + jinja2)</p>
+    </hgroup>
+
+    <section id="form-wrapper">
+      {% include "form.html" %}
+    </section>
+
+    <section id="expense-list-wrapper">
+      {% include "list.html" %}
+    </section>
+  </main>
+</body>
+</html>
