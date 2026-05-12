@@ -5,6 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<SqliteOptions>(builder.Configuration);
 builder.Services.AddSingleton<SqliteConnectionFactory>();
 builder.Services.AddSingleton<SchemaInitializer>();
+builder.Services.AddSingleton<ExpenseRepository>();
 
 builder.Services.AddRazorPages();
 builder.Services.AddAntiforgery(opts =>
