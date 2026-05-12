@@ -83,3 +83,15 @@ def form_fragment(request: Request, id: Optional[int] = None):
         "is_oob": False,
     }
     return _render("form.html", request, ctx)
+
+
+@app.get("/expenses/total-context", response_class=HTMLResponse)
+def total_context(request: Request, excluding_id: Optional[int] = None):
+    """Fragmento <input> com soma de todos os valores, exceto excluding_id."""
+    # excluding_id pode chegar como '' por causa do template — Optional[int] lida com isso
+    total = repository.sum_all(excluding_id)
+    ctx = {
+        "total_acumulado_str": brl(total),
+        "excluding_id": excluding_id,
+    }
+    return _render("total_context.html", request, ctx)
