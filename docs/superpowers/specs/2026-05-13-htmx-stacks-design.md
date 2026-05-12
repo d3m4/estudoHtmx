@@ -69,7 +69,7 @@ campos, na ordem:
 |---|---|---|---|
 | id | hidden | nao | preenchido quando editando |
 | nome | text | sim | min 1 char |
-| valor | text | sim | aceita numero direto ou expressao `=...`. **hint visual obrigatorio**: um `<small>` abaixo do input com texto `ex: 100, -50, 1234,56 ou =(50/2)+10` (cor neutra/muted do pico) |
+| valor | text | sim | aceita numero direto ou expressao `=...`. **hint visual obrigatorio**: `<small class="hint">ex: 100, -50, 1234,56 ou =(50/2)+10</small>` abaixo do input (estilo definido no layout: cor `var(--pico-muted-color)` ou similar) |
 | total_acumulado | text readonly | n/a | carregado via ajax (ver 4.4) |
 | descricao | textarea | nao | livre |
 
@@ -110,12 +110,12 @@ icones via cdn de **bootstrap icons**.
 ### 4.4 total acumulado no form
 
 - campo readonly
-- carregado via **ajax htmx no `focusout` do form** com debounce 300ms:
+- carregado via **ajax htmx no `focusout` do form** com debounce 300ms (trigger **escopado ao form** via `from:#expense-form input/textarea`):
   ```html
   <input id="total_acumulado" readonly
          hx-get="/expenses/total-context?excluding_id={id ou vazio}"
-         hx-trigger="focusout from:input delay:300ms,
-                     focusout from:textarea delay:300ms"
+         hx-trigger="focusout from:#expense-form input delay:300ms,
+                     focusout from:#expense-form textarea delay:300ms"
          hx-target="this"
          hx-swap="outerHTML">
   ```
@@ -292,6 +292,17 @@ regras:
 erros sao **devolvidos como HTML** no proprio fragmento do form
 (`<small class="error">...</small>` abaixo do input invalido).
 
+**mensagens padronizadas** (idênticas nos 5 stacks pra teste cross-stack):
+
+| campo | condicao | mensagem |
+|---|---|---|
+| nome | vazio ou so whitespace | `nome obrigatorio` |
+| valor | qualquer falha (vazio, sintaxe, NaN, infinito) | `valor invalido` |
+
+stacks podem usar mensagens mais detalhadas em logs/exceptions internas, mas
+a string exibida ao usuario no `<small class="error">` deve ser uma das duas
+acima.
+
 ## 9. acoes do usuario (fluxo completo)
 
 | acao | request | response |
@@ -335,6 +346,23 @@ cross-stack:
 - ci / cd
 - tema dark / customizacao visual alem do pico default
 - i18n alem de pt-BR
+
+## 11.1 versoes das dependencias compartilhadas (CDN)
+
+todas as stacks usam as **mesmas versoes** das libs front-end via CDN, pra que
+o estudo isole apenas a variavel do backend:
+
+| lib | versao | url |
+|---|---|---|
+| pico CSS | 2.x | `https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css` |
+| bootstrap-icons | 1.11.3 | `https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css` |
+| htmx | 1.9.12 | `https://unpkg.com/htmx.org@1.9.12` |
+
+icones usados:
+- editar: `bi-pencil`
+- zerar: `bi-arrow-counterclockwise`
+
+confirm dialog do zerar (via `hx-confirm`): texto `Zerar este item?`.
 
 ## 12. riscos e mitigacoes
 

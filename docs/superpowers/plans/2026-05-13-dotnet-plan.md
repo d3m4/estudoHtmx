@@ -646,7 +646,7 @@ public static class ValorParser
                 CultureInfo.InvariantCulture,
                 out var n))
         {
-            return new ParseResult(false, 0d, "valor invalido: nao e numero nem expressao");
+            return new ParseResult(false, 0d, "valor invalido");
         }
 
         if (double.IsNaN(n) || double.IsInfinity(n))
@@ -867,7 +867,7 @@ public sealed class TotalContextModel
        value="@EstudoHtmx.Services.CurrencyFormatter.Brl(Model.Total)"
        data-excluding-id="@idAttr"
        hx-get="/expenses/total-context?excluding_id=@idAttr"
-       hx-trigger="focusout from:input delay:300ms, focusout from:textarea delay:300ms"
+       hx-trigger="focusout from:#expense-form input delay:300ms, focusout from:#expense-form textarea delay:300ms"
        hx-target="this"
        hx-swap="outerHTML" />
 ```
@@ -1852,7 +1852,7 @@ Clear `nome`, type any valid `valor`, click `salvar`. Confirm the form re-render
 
 - [ ] **Step 7: Validar erro — valor=abc**
 
-Type `nome = x`, `valor = abc`, click `salvar`. Confirm an inline error `valor invalido: nao e numero nem expressao` appears.
+Type `nome = x`, `valor = abc`, click `salvar`. Confirm an inline error `valor invalido` appears.
 
 - [ ] **Step 8: Zerar uma despesa**
 

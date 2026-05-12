@@ -350,9 +350,9 @@ def parse_valor(raw: str) -> float:
     try:
         v = float(normalized)
     except ValueError:
-        raise ParseError(f"valor invalido: {raw!r}")
+        raise ParseError("valor invalido")
     if not math.isfinite(v):
-        raise ParseError("valor numerico nao finito")
+        raise ParseError("valor invalido")
     return v
 
 
@@ -481,7 +481,7 @@ Create file `C:\Dev\github\estudoHtmx\python\templates\layout.html`:
   <title>estudoHtmx — python</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
   <style>
     .negativo { color: var(--pico-color-red-500, #c0392b); }
     .acoes button { padding: 0.25rem 0.5rem; margin: 0 0.1rem; }
@@ -1222,7 +1222,7 @@ Confirmar: erro inline `nome obrigatorio` abaixo do nome.
 
 No form: nome=`teste`, valor=`abc`. Salvar.
 
-Confirmar: erro inline `valor invalido: 'abc'` abaixo do valor.
+Confirmar: erro inline `valor invalido` abaixo do valor.
 
 - [ ] **Step 8: Zerar despesa**
 
