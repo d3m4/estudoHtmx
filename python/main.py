@@ -68,3 +68,18 @@ def list_expenses(request: Request, page: int = 1):
         "is_oob": False,
     }
     return _render("list.html", request, ctx)
+
+
+@app.get("/expenses/form", response_class=HTMLResponse)
+def form_fragment(request: Request, id: Optional[int] = None):
+    """Form vazio (modo novo) ou preenchido pra edicao."""
+    expense = repository.get_by_id(id) if id else None
+    excluding = expense.id if expense else None
+    total_str = brl(repository.sum_all(excluding))
+    ctx = {
+        "expense": expense,
+        "errors": {},
+        "total_acumulado_str": total_str,
+        "is_oob": False,
+    }
+    return _render("form.html", request, ctx)
