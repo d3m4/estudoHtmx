@@ -1,0 +1,37 @@
+{{define "form"}}
+<form id="expense-form"
+      hx-post="/expenses"
+      hx-target="#expense-form"
+      hx-swap="outerHTML"
+      {{if .OOB}}hx-swap-oob="true"{{end}}>
+  <input type="hidden" name="id" value="{{if .Expense.Id}}{{.Expense.Id}}{{end}}">
+
+  <label>
+    nome
+    <input type="text" name="nome" value="{{.Expense.Nome}}" autofocus required>
+    {{with .Errors.Nome}}<small class="error">{{.}}</small>{{end}}
+  </label>
+
+  <label>
+    valor
+    <input type="text" name="valor" value="{{.ValorRaw}}" required>
+    <small class="hint">ex: 100, -50, 1234,56 ou =(50/2)+10</small>
+    {{with .Errors.Valor}}<small class="error">{{.}}</small>{{end}}
+  </label>
+
+  {{template "total_context" .TotalContext}}
+
+  <label>
+    descricao
+    <textarea name="descricao" rows="2">{{.Expense.Descricao}}</textarea>
+  </label>
+
+  <div role="group">
+    <button type="submit">salvar</button>
+    <button type="button" class="secondary"
+            hx-get="/expenses/form"
+            hx-target="#expense-form"
+            hx-swap="outerHTML">cancelar</button>
+  </div>
+</form>
+{{end}}
