@@ -1,0 +1,51 @@
+{# fragmento: <form id="expense-form"> #}
+<form id="expense-form"
+      hx-post="/expenses"
+      hx-target="#expense-form"
+      hx-swap="outerHTML"
+      {% if is_oob %}hx-swap-oob="true"{% endif %}>
+
+  <input type="hidden" name="id" value="{{ (expense.id if expense else '') }}">
+
+  <label>
+    nome
+    <input type="text" name="nome"
+           value="{{ (expense.nome if expense else '') }}"
+           required minlength="1"
+           aria-invalid="{{ 'true' if errors.get('nome') else 'false' }}">
+    {% if errors.get('nome') %}<small class="error">{{ errors['nome'] }}</small>{% endif %}
+  </label>
+
+  <label>
+    valor
+    <input type="text" name="valor"
+           value="{{ (raw_valor if raw_valor is defined else (expense.valor if expense else '')) }}"
+           required
+           aria-invalid="{{ 'true' if errors.get('valor') else 'false' }}">
+    <small class="hint">ex: 100, -50, 1234,56 ou =(50/2)+10</small>
+    {% if errors.get('valor') %}<small class="error">{{ errors['valor'] }}</small>{% endif %}
+  </label>
+
+  <label>
+    total acumulado
+    <input id="total_acumulado" name="total_acumulado" type="text" readonly
+           value="{{ total_acumulado_str }}"
+           hx-get="/expenses/total-context?excluding_id={{ expense.id if expense else '' }}"
+           hx-trigger="focusout from:#expense-form input delay:300ms, focusout from:#expense-form textarea delay:300ms"
+           hx-target="this"
+           hx-swap="outerHTML">
+  </label>
+
+  <label>
+    descricao
+    <textarea name="descricao" rows="2">{{ (expense.descricao if expense else '') }}</textarea>
+  </label>
+
+  <div class="grid">
+    <button type="submit">salvar</button>
+    <button type="button" class="secondary"
+            hx-get="/expenses/form"
+            hx-target="#expense-form"
+            hx-swap="outerHTML">cancelar</button>
+  </div>
+</form>
