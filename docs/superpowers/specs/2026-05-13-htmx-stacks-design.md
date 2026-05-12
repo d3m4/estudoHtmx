@@ -69,7 +69,7 @@ campos, na ordem:
 |---|---|---|---|
 | id | hidden | nao | preenchido quando editando |
 | nome | text | sim | min 1 char |
-| valor | text | sim | aceita numero direto ou expressao `=...` |
+| valor | text | sim | aceita numero direto ou expressao `=...`. **hint visual obrigatorio**: um `<small>` abaixo do input com texto `ex: 100, -50, 1234,56 ou =(50/2)+10` (cor neutra/muted do pico) |
 | total_acumulado | text readonly | n/a | carregado via ajax (ver 4.4) |
 | descricao | textarea | nao | livre |
 
