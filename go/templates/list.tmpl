@@ -1,0 +1,68 @@
+{{define "list"}}
+<div id="expense-list-wrapper" {{if .OOB}}hx-swap-oob="true"{{end}}>
+  <table role="grid">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>nome</th>
+        <th>valor</th>
+        <th>total acumulado</th>
+        <th>descricao</th>
+        <th>acoes</th>
+      </tr>
+    </thead>
+    <tbody id="expense-list">
+      {{range .Rows}}
+      <tr>
+        <td>{{.Id}}</td>
+        <td>{{.Nome}}</td>
+        <td class="{{if lt .Valor 0.0}}valor-negativo{{end}}">{{brl .Valor}}</td>
+        <td class="{{if lt .TotalAcumulado 0.0}}valor-negativo{{end}}">{{brl .TotalAcumulado}}</td>
+        <td class="descricao-cell" title="{{.Descricao}}">{{.Descricao}}</td>
+        <td class="acoes-cell">
+          <button type="button"
+                  hx-get="/expenses/form?id={{.Id}}"
+                  hx-target="#expense-form"
+                  hx-swap="outerHTML"
+                  aria-label="editar">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button type="button" class="secondary"
+                  hx-post="/expenses/{{.Id}}/zerar"
+                  hx-confirm="Zerar este item?"
+                  hx-target="#expense-form"
+                  hx-swap="outerHTML"
+                  aria-label="zerar">
+            <i class="bi bi-arrow-counterclockwise"></i>
+          </button>
+        </td>
+      </tr>
+      {{else}}
+      <tr><td colspan="6"><em>nenhuma despesa ainda.</em></td></tr>
+      {{end}}
+    </tbody>
+  </table>
+
+  {{if gt .TotalPages 1}}
+  <nav class="pagination" aria-label="paginacao">
+    <button type="button" {{if eq .Page 1}}disabled{{end}}
+            hx-get="/expenses?page=1"
+            hx-target="#expense-list-wrapper"
+            hx-swap="outerHTML">&laquo;</button>
+    <button type="button" {{if eq .Page 1}}disabled{{end}}
+            hx-get="/expenses?page={{.PrevPage}}"
+            hx-target="#expense-list-wrapper"
+            hx-swap="outerHTML">&lsaquo;</button>
+    <span>pagina {{.Page}} de {{.TotalPages}}</span>
+    <button type="button" {{if eq .Page .TotalPages}}disabled{{end}}
+            hx-get="/expenses?page={{.NextPage}}"
+            hx-target="#expense-list-wrapper"
+            hx-swap="outerHTML">&rsaquo;</button>
+    <button type="button" {{if eq .Page .TotalPages}}disabled{{end}}
+            hx-get="/expenses?page={{.TotalPages}}"
+            hx-target="#expense-list-wrapper"
+            hx-swap="outerHTML">&raquo;</button>
+  </nav>
+  {{end}}
+</div>
+{{end}}
