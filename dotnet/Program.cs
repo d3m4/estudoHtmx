@@ -1,26 +1,31 @@
+using EstudoHtmx.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.Services.Configure<SqliteOptions>(builder.Configuration);
+builder.Services.AddSingleton<SqliteConnectionFactory>();
+builder.Services.AddSingleton<SchemaInitializer>();
+
 builder.Services.AddRazorPages();
+builder.Services.AddAntiforgery(opts =>
+{
+    opts.HeaderName = "X-CSRF-TOKEN";
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+// aplica schema (idempotente) antes de aceitar requests
+using (var scope = app.Services.CreateScope())
 {
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    scope.ServiceProvider
+        .GetRequiredService<SchemaInitializer>()
+        .EnsureSchema();
 }
 
-app.UseHttpsRedirection();
-
+app.UseStaticFiles();
 app.UseRouting();
+app.UseAntiforgery();
 
-app.UseAuthorization();
-
-app.MapStaticAssets();
-app.MapRazorPages()
-   .WithStaticAssets();
+app.MapRazorPages();
 
 app.Run();
