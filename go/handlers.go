@@ -182,3 +182,27 @@ func (s *server) handleListExpenses(w http.ResponseWriter, r *http.Request) {
 	}
 	s.renderTemplate(w, "list", vm)
 }
+
+// handleFormFragment serve GET /expenses/form?id=N — fragmento htmx do form,
+// vazio ou preenchido pra edicao.
+func (s *server) handleFormFragment(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Query().Get("id")
+	var exp *Expense
+	if idStr != "" {
+		id := parseInt64(idStr)
+		if id > 0 {
+			found, err := getExpense(s.db, id)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			exp = found
+		}
+	}
+	vm, err := s.buildFormVM(exp, "", nil, false)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	s.renderTemplate(w, "form", vm)
+}
