@@ -29,6 +29,14 @@ app.get("/", (c) => {
   );
 });
 
+// GET /expenses?page=N  -> fragmento <article id="expense-table">
+app.get("/expenses", (c) => {
+  const pageParam = c.req.query("page");
+  const page = pageParam ? parseInt(pageParam, 10) : 1;
+  const { rows, page: safePage, totalPages } = listExpenses(page);
+  return c.html(<List rows={rows} page={safePage} totalPages={totalPages} />);
+});
+
 const port = Number(process.env.PORT ?? 5004);
 console.log(`[node] servidor escutando em http://localhost:${port}`);
 export default { port, fetch: app.fetch };
