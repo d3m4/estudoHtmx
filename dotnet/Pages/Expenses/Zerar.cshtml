@@ -1,0 +1,6 @@
+@page "/expenses/{id:long}/zerar"
+@model EstudoHtmx.Pages.Expenses.ZerarPageModel
+@{
+    Layout = null;
+}
+@await Html.PartialAsync("_FormWithOob", Model.Vm)
