@@ -30,8 +30,8 @@ def _is_htmx(request: Request) -> bool:
 
 
 def _render(name: str, request: Request, ctx: dict) -> HTMLResponse:
-    ctx_full = {"request": request, **ctx}
-    return templates.TemplateResponse(name, ctx_full)
+    # starlette 0.35+ exige request como primeiro arg posicional
+    return templates.TemplateResponse(request, name, ctx)
 
 
 @app.get("/", response_class=HTMLResponse)
