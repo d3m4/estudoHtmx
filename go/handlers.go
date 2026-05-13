@@ -221,3 +221,116 @@ func (s *server) handleTotalContext(w http.ResponseWriter, r *http.Request) {
 		ExcludingId: excludingId,
 	})
 }
+
+// handleSaveExpense serve POST /expenses. Faz validacao server-side, executa
+// insert ou update, e retorna fragmento htmx contendo:
+//   - form re-renderizado (zerado em sucesso, com erros em falha)
+//   - tbody atualizado via hx-swap-oob (somente em sucesso)
+//
+// Em sucesso tambem emite o header HX-Trigger: itemSaved.
+func (s *server) handleSaveExpense(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "form invalido", http.StatusBadRequest)
+		return
+	}
+
+	id := parseInt64(r.PostFormValue("id"))
+	nomeRaw := r.PostFormValue("nome")
+	valorRaw := r.PostFormValue("valor")
+	descricao := r.PostFormValue("descricao")
+
+	nome := strings.TrimSpace(nomeRaw)
+	errs := map[string]string{}
+
+	if nome == "" {
+		errs["Nome"] = "nome e obrigatorio"
+	}
+
+	valor, valorErr := parseValor(valorRaw)
+	if valorErr != nil {
+		errs["Valor"] = valorErr.Error()
+	}
+
+	if len(errs) > 0 {
+		// devolve o form com erros, sem swap-oob da lista.
+		exp := &Expense{
+			Id:        id,
+			Nome:      nomeRaw,
+			Descricao: descricao,
+		}
+		vm, err := s.buildFormVM(exp, valorRaw, errs, false)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		s.renderTemplate(w, "form", vm)
+		return
+	}
+
+	if id > 0 {
+		if err := updateExpense(s.db, id, nome, valor, descricao); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		newId, err := insertExpense(s.db, nome, valor, descricao)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		_ = newId
+	}
+
+	// pagina atual: derivada do header HX-Current-URL se possivel; default 1.
+	page := currentPageFromRequest(r)
+
+	formVM, err := s.buildFormVM(nil, "", nil, false)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	listVM, err := s.buildListVM(page, true)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("HX-Trigger", "itemSaved")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	// form e o target principal; list vem via hx-swap-oob (template ja inclui
+	// o atributo quando .OOB == true).
+	if err := s.tmpls.ExecuteTemplate(w, "form", formVM); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := s.tmpls.ExecuteTemplate(w, "list", listVM); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+// currentPageFromRequest tenta extrair a pagina ativa da URL atual do htmx
+// (header HX-Current-URL). Fallback: query string "page" ou 1.
+func currentPageFromRequest(r *http.Request) int {
+	if cur := r.Header.Get("HX-Current-URL"); cur != "" {
+		if i := strings.Index(cur, "page="); i >= 0 {
+			tail := cur[i+len("page="):]
+			end := len(tail)
+			for j, c := range tail {
+				if c == '&' || c == '#' {
+					end = j
+					break
+				}
+			}
+			if n, err := strconv.Atoi(tail[:end]); err == nil && n > 0 {
+				return n
+			}
+		}
+	}
+	if p := r.URL.Query().Get("page"); p != "" {
+		if n, err := strconv.Atoi(p); err == nil && n > 0 {
+			return n
+		}
+	}
+	return 1
+}
