@@ -170,3 +170,15 @@ func (s *server) handleIndex(w http.ResponseWriter, r *http.Request) {
 	}
 	s.renderTemplate(w, "layout", pageVM{Form: formVM, List: listVM})
 }
+
+// handleListExpenses serve GET /expenses?page=N — fragmento htmx da tabela
+// inteira (incluindo paginacao).
+func (s *server) handleListExpenses(w http.ResponseWriter, r *http.Request) {
+	page := parseIntDefault(r.URL.Query().Get("page"), 1)
+	vm, err := s.buildListVM(page, false)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	s.renderTemplate(w, "list", vm)
+}
