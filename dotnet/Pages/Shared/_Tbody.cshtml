@@ -1,0 +1,43 @@
+@model EstudoHtmx.Pages.Shared.ListModel
+<tbody id="expense-list">
+    @if (Model.Rows.Count == 0)
+    {
+        <tr>
+            <td colspan="6"><em>nenhuma despesa cadastrada</em></td>
+        </tr>
+    }
+    else
+    {
+        foreach (var r in Model.Rows)
+        {
+            var valorClass = r.Valor < 0 ? "valor-neg" : "";
+            var totalClass = r.TotalAcumulado < 0 ? "valor-neg" : "";
+            <tr id="row-@r.Id">
+                <td>@r.Id</td>
+                <td>@r.Nome</td>
+                <td class="@valorClass">@EstudoHtmx.Services.CurrencyFormatter.Brl(r.Valor)</td>
+                <td class="@totalClass">@EstudoHtmx.Services.CurrencyFormatter.Brl(r.TotalAcumulado)</td>
+                <td class="descricao" title="@r.Descricao">@r.Descricao</td>
+                <td class="acoes-cell">
+                    <button type="button"
+                            class="secondary"
+                            title="editar"
+                            hx-get="/expenses/form?id=@r.Id"
+                            hx-target="#expense-form"
+                            hx-swap="outerHTML">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button type="button"
+                            class="contrast"
+                            title="zerar"
+                            hx-post="/expenses/@r.Id/zerar"
+                            hx-target="#expense-list"
+                            hx-swap="outerHTML"
+                            hx-confirm="Zerar este item?">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    }
+</tbody>
