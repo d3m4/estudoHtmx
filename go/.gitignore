@@ -1,0 +1,16 @@
+# binarios
+estudohtmx-go
+estudohtmx-go.exe
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# testes / cobertura
+*.test
+*.out
+coverage.out
+
+# diretorios de cache do go
+/vendor/
