@@ -192,3 +192,35 @@ async def submit_expense(
         content=combined,
         headers={"HX-Trigger": "itemSaved"},
     )
+
+
+@app.post("/expenses/{expense_id}/zerar", response_class=HTMLResponse)
+def zerar_expense(request: Request, expense_id: int):
+    """Seta valor=0. Retorna lista atualizada + form limpo (oob)."""
+    repository.zerar(expense_id)
+
+    page = 1
+    total_pages = repository.total_pages()
+    expenses = repository.list_page(page)
+    total_str = brl(repository.sum_all(None))
+
+    list_html = templates.get_template("list.html").render({
+        "request": request,
+        "expenses": expenses,
+        "page": page,
+        "total_pages": total_pages,
+        "is_oob": False,
+    })
+    form_html = templates.get_template("form.html").render({
+        "request": request,
+        "expense": None,
+        "errors": {},
+        "total_acumulado_str": total_str,
+        "is_oob": True,
+    })
+
+    combined = list_html + "\n" + form_html
+    return HTMLResponse(
+        content=combined,
+        headers={"HX-Trigger": "itemZerado"},
+    )
