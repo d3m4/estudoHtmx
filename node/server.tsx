@@ -37,6 +37,28 @@ app.get("/expenses", (c) => {
   return c.html(<List rows={rows} page={safePage} totalPages={totalPages} />);
 });
 
+// GET /expenses/form?id=N  -> form preenchido (ou vazio se sem id)
+app.get("/expenses/form", (c) => {
+  const idParam = c.req.query("id");
+  const id = idParam ? parseInt(idParam, 10) : NaN;
+
+  if (Number.isFinite(id)) {
+    const exp = getExpenseById(id);
+    if (exp) {
+      const state: FormState = {
+        id: exp.id,
+        nome: exp.nome,
+        valor: String(exp.valor),
+        descricao: exp.descricao,
+        errors: {},
+      };
+      return c.html(<Form state={state} totalContext={sumExcluding(exp.id)} />);
+    }
+  }
+  // sem id ou id invalido -> form vazio
+  return c.html(<Form state={emptyFormState()} totalContext={sumOfAll()} />);
+});
+
 const port = Number(process.env.PORT ?? 5004);
 console.log(`[node] servidor escutando em http://localhost:${port}`);
 export default { port, fetch: app.fetch };
