@@ -185,4 +185,13 @@ app.post("/expenses/:id/zerar", (c) => {
 
 const port = Number(process.env.PORT ?? 5004);
 console.log(`[node] servidor escutando em http://localhost:${port}`);
+
+// runtime detection: Bun usa o `export default { port, fetch }`;
+// Node.js precisa de `@hono/node-server` para escutar.
+declare const Bun: unknown;
+if (typeof Bun === "undefined") {
+  const { serve } = await import("@hono/node-server");
+  serve({ fetch: app.fetch, port });
+}
+
 export default { port, fetch: app.fetch };
