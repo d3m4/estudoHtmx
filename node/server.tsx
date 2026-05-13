@@ -59,6 +59,16 @@ app.get("/expenses/form", (c) => {
   return c.html(<Form state={emptyFormState()} totalContext={sumOfAll()} />);
 });
 
+// GET /expenses/total-context?excluding_id=N  -> <input id="total_acumulado">
+app.get("/expenses/total-context", (c) => {
+  const raw = c.req.query("excluding_id");
+  const id = raw && raw !== "" ? parseInt(raw, 10) : NaN;
+  if (Number.isFinite(id)) {
+    return c.html(<TotalContext excludingId={id} total={sumExcluding(id)} />);
+  }
+  return c.html(<TotalContext excludingId={null} total={sumOfAll()} />);
+});
+
 const port = Number(process.env.PORT ?? 5004);
 console.log(`[node] servidor escutando em http://localhost:${port}`);
 export default { port, fetch: app.fetch };
