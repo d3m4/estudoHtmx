@@ -206,3 +206,18 @@ func (s *server) handleFormFragment(w http.ResponseWriter, r *http.Request) {
 	}
 	s.renderTemplate(w, "form", vm)
 }
+
+// handleTotalContext serve GET /expenses/total-context?excluding_id=N —
+// fragmento htmx do <input> de total_acumulado.
+func (s *server) handleTotalContext(w http.ResponseWriter, r *http.Request) {
+	excludingId := parseInt64(r.URL.Query().Get("excluding_id"))
+	total, err := sumAll(s.db, excludingId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	s.renderTemplate(w, "total_context", totalCtxVM{
+		Total:       total,
+		ExcludingId: excludingId,
+	})
+}
