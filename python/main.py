@@ -95,3 +95,100 @@ def total_context(request: Request, excluding_id: Optional[int] = None):
         "excluding_id": excluding_id,
     }
     return _render("total_context.html", request, ctx)
+
+
+@app.post("/expenses", response_class=HTMLResponse)
+async def submit_expense(
+    request: Request,
+    id: str = Form(""),
+    nome: str = Form(""),
+    valor: str = Form(""),
+    descricao: str = Form(""),
+):
+    """Submit do form. Valida, persiste, retorna form + tbody (oob)."""
+    errors: dict[str, str] = {}
+
+    # parse id (vazio = novo)
+    expense_id: Optional[int] = None
+    if id.strip():
+        try:
+            expense_id = int(id)
+        except ValueError:
+            expense_id = None  # ignora id invalido, trata como novo
+
+    # validacao nome
+    nome_clean = nome.strip()
+    if nome_clean == "":
+        errors["nome"] = "nome obrigatorio"
+
+    # validacao valor
+    valor_parsed: Optional[float] = None
+    try:
+        valor_parsed = parse_valor(valor)
+    except ParseError as e:
+        errors["valor"] = str(e)
+
+    descricao_clean = descricao or ""
+
+    if errors:
+        # re-renderiza o form com erros — preserva inputs e raw_valor
+        excluding = expense_id
+        total_str = brl(repository.sum_all(excluding))
+        # monta um "pseudo-expense" pra repreencher (evita perder dados em caso de erro)
+        partial_expense = None
+        if expense_id is not None:
+            existing = repository.get_by_id(expense_id)
+            if existing:
+                partial_expense = existing
+        # injeta nome/descricao digitados no contexto via dict-like
+        # truque simples: usar um SimpleNamespace
+        from types import SimpleNamespace
+        expense_ctx = SimpleNamespace(
+            id=expense_id if expense_id is not None else "",
+            nome=nome_clean,
+            valor=valor,  # raw — pra preservar o que o usuario digitou
+            descricao=descricao_clean,
+            created_at="",
+        )
+        ctx = {
+            "expense": expense_ctx,
+            "errors": errors,
+            "total_acumulado_str": total_str,
+            "is_oob": False,
+            "raw_valor": valor,
+        }
+        return _render("form.html", request, ctx)
+
+    # persiste
+    assert valor_parsed is not None
+    if expense_id is not None and repository.get_by_id(expense_id) is not None:
+        repository.update(expense_id, nome_clean, valor_parsed, descricao_clean)
+    else:
+        repository.insert(nome_clean, valor_parsed, descricao_clean)
+
+    # response: form zerado + lista oob da pagina 1
+    page = 1
+    total_pages = repository.total_pages()
+    expenses = repository.list_page(page)
+    total_str = brl(repository.sum_all(None))
+
+    form_html = templates.get_template("form.html").render({
+        "request": request,
+        "expense": None,
+        "errors": {},
+        "total_acumulado_str": total_str,
+        "is_oob": False,
+    })
+    list_html = templates.get_template("list.html").render({
+        "request": request,
+        "expenses": expenses,
+        "page": page,
+        "total_pages": total_pages,
+        "is_oob": True,
+    })
+
+    combined = form_html + "\n" + list_html
+    return HTMLResponse(
+        content=combined,
+        headers={"HX-Trigger": "itemSaved"},
+    )
