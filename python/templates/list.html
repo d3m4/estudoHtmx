@@ -1,0 +1,77 @@
+{# fragmento: a tabela inteira da pagina atual. id principal e expense-list-wrapper. #}
+<div id="expense-list-wrapper"
+     {% if is_oob %}hx-swap-oob="true"{% endif %}>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>nome</th>
+        <th>valor</th>
+        <th>total acumulado</th>
+        <th>descricao</th>
+        <th>acoes</th>
+      </tr>
+    </thead>
+    <tbody id="expense-list">
+      {% if expenses|length == 0 %}
+        <tr><td colspan="6"><em>nenhuma despesa cadastrada ainda.</em></td></tr>
+      {% else %}
+        {% for e in expenses %}
+        <tr>
+          <td>{{ e.id }}</td>
+          <td>{{ e.nome }}</td>
+          <td class="{{ 'negativo' if e.valor < 0 else '' }}">{{ e.valor|brl }}</td>
+          <td class="{{ 'negativo' if e.total_acumulado < 0 else '' }}">{{ e.total_acumulado|brl }}</td>
+          <td class="truncate" title="{{ e.descricao }}">{{ e.descricao }}</td>
+          <td class="acoes">
+            <button type="button"
+                    title="editar"
+                    hx-get="/expenses/form?id={{ e.id }}"
+                    hx-target="#expense-form"
+                    hx-swap="outerHTML">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button type="button"
+                    class="secondary"
+                    title="zerar"
+                    hx-post="/expenses/{{ e.id }}/zerar"
+                    hx-confirm="Zerar este item?"
+                    hx-target="#expense-list-wrapper"
+                    hx-swap="outerHTML">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      {% endif %}
+    </tbody>
+  </table>
+
+  <nav class="pagination" aria-label="paginacao">
+    <button type="button"
+            {% if page <= 1 %}disabled{% endif %}
+            hx-get="/expenses?page=1"
+            hx-target="#expense-list-wrapper"
+            hx-swap="outerHTML"
+            title="primeira">&laquo;</button>
+    <button type="button"
+            {% if page <= 1 %}disabled{% endif %}
+            hx-get="/expenses?page={{ page - 1 }}"
+            hx-target="#expense-list-wrapper"
+            hx-swap="outerHTML"
+            title="anterior">&lt;</button>
+    <span class="pag-info">pagina {{ page }} de {{ total_pages }}</span>
+    <button type="button"
+            {% if page >= total_pages %}disabled{% endif %}
+            hx-get="/expenses?page={{ page + 1 }}"
+            hx-target="#expense-list-wrapper"
+            hx-swap="outerHTML"
+            title="proxima">&gt;</button>
+    <button type="button"
+            {% if page >= total_pages %}disabled{% endif %}
+            hx-get="/expenses?page={{ total_pages }}"
+            hx-target="#expense-list-wrapper"
+            hx-swap="outerHTML"
+            title="ultima">&raquo;</button>
+  </nav>
+</div>

@@ -1,0 +1,7 @@
+{# retornado por GET /expenses/total-context — substitui o proprio <input> #}
+<input id="total_acumulado" name="total_acumulado" type="text" readonly
+       value="{{ total_acumulado_str }}"
+       hx-get="/expenses/total-context?excluding_id={{ excluding_id or '' }}"
+       hx-trigger="focusout from:#expense-form input delay:300ms, focusout from:#expense-form textarea delay:300ms"
+       hx-target="this"
+       hx-swap="outerHTML">
