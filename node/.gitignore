@@ -1,0 +1,6 @@
+node_modules/
+*.log
+.env
+.DS_Store
+bun.lockb
+package-lock.json
