@@ -1,0 +1,6 @@
+@page "/expenses/total-context"
+@model EstudoHtmx.Pages.Expenses.TotalContextPageModel
+@{
+    Layout = null;
+}
+@await Html.PartialAsync("_TotalContext", Model.Vm)

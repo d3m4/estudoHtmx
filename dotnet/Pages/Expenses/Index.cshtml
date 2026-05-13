@@ -1,0 +1,6 @@
+@page "/expenses"
+@model EstudoHtmx.Pages.Expenses.IndexModel
+@{
+    Layout = null;
+}
+@await Html.PartialAsync("_List", Model.ListVm)

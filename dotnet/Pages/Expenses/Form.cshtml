@@ -1,0 +1,6 @@
+@page "/expenses/form"
+@model EstudoHtmx.Pages.Expenses.FormPageModel
+@{
+    Layout = null;
+}
+@await Html.PartialAsync("_Form", Model.FormVm)

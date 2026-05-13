@@ -1,0 +1,13 @@
+@page
+@model EstudoHtmx.Pages.IndexModel
+@{
+    ViewData["Title"] = "despesas";
+}
+
+<section>
+    @await Html.PartialAsync("_Form", Model.FormVm)
+</section>
+
+<section>
+    @await Html.PartialAsync("_List", Model.ListVm)
+</section>

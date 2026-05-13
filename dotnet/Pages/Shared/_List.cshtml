@@ -1,0 +1,52 @@
+@model EstudoHtmx.Pages.Shared.ListModel
+@{
+    var prev = Math.Max(1, Model.Page - 1);
+    var next = Math.Min(Model.TotalPages, Model.Page + 1);
+    var atFirst = Model.Page <= 1;
+    var atLast = Model.Page >= Model.TotalPages;
+}
+<div id="expense-list-wrapper">
+    <figure>
+        <table role="grid">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">nome</th>
+                    <th scope="col">valor</th>
+                    <th scope="col">total acumulado</th>
+                    <th scope="col">descricao</th>
+                    <th scope="col">acoes</th>
+                </tr>
+            </thead>
+            @await Html.PartialAsync("_Tbody", Model)
+        </table>
+    </figure>
+
+    <nav class="pagination" id="expense-pagination">
+        <button type="button"
+                class="secondary"
+                disabled="@(atFirst ? "disabled" : null)"
+                hx-get="/expenses?page=1"
+                hx-target="#expense-list-wrapper"
+                hx-swap="outerHTML">&lt;&lt;</button>
+        <button type="button"
+                class="secondary"
+                disabled="@(atFirst ? "disabled" : null)"
+                hx-get="/expenses?page=@prev"
+                hx-target="#expense-list-wrapper"
+                hx-swap="outerHTML">&lt;</button>
+        <span>pagina @Model.Page de @Model.TotalPages</span>
+        <button type="button"
+                class="secondary"
+                disabled="@(atLast ? "disabled" : null)"
+                hx-get="/expenses?page=@next"
+                hx-target="#expense-list-wrapper"
+                hx-swap="outerHTML">&gt;</button>
+        <button type="button"
+                class="secondary"
+                disabled="@(atLast ? "disabled" : null)"
+                hx-get="/expenses?page=@Model.TotalPages"
+                hx-target="#expense-list-wrapper"
+                hx-swap="outerHTML">&gt;&gt;</button>
+    </nav>
+</div>
