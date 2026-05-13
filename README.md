@@ -32,27 +32,46 @@ a partir de `shared/schema.sql`).
 lock contention durante o estudo a recomendacao e ligar apenas um servidor de
 cada vez). use Ctrl+C pra parar antes de subir o proximo.
 
-a partir da raiz do repositorio:
+a partir da raiz do repositorio. **4 das 5 stacks tem comandos identicos
+em qualquer plataforma** (so o node difere por causa de bug do bun no windows):
 
-```powershell
-# .net  ->  http://localhost:5001
-cd dotnet; dotnet run
+```sh
+# .net     ->  http://localhost:5001
+cd dotnet
+dotnet run
 
-# go  ->  http://localhost:5002
-cd go; go run .
+# go       ->  http://localhost:5002
+cd go
+go run .
 
 # python (com uv)  ->  http://localhost:5003
-cd python; uv run uvicorn main:app --port 5003
+cd python
+uv run uvicorn main:app --port 5003
 
-# node  ->  http://localhost:5004
-# IMPORTANTE: no windows, use Node + tsx (NAO bun).
-# bun 1.1.x segfalha ao carregar better-sqlite3 no windows
-# (incompatibilidade do dlopen do bun com o N-API binding).
-cd node; npx tsx server.tsx
-
-# rust  ->  http://localhost:5005
-cd rust; cargo run
+# rust     ->  http://localhost:5005
+cd rust
+cargo run
 ```
+
+### node — comando depende da plataforma
+
+linux / mac (bun funciona normalmente):
+
+```sh
+cd node
+bun --hot run server.tsx       # http://localhost:5004
+```
+
+windows (use Node + tsx — bun segfalha aqui):
+
+```powershell
+cd node
+npx tsx server.tsx             # http://localhost:5004
+```
+
+> motivo: `bun 1.1.x` crasha ao carregar `better-sqlite3` no windows
+> (incompatibilidade conhecida do `dlopen` do bun com o N-API binding nativo).
+> em linux/mac nao acontece.
 
 ## como comparar
 
