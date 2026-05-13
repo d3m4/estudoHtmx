@@ -1,0 +1,8 @@
+@model EstudoHtmx.Pages.Shared.FormWithOobModel
+@await Html.PartialAsync("_Form", Model.Form)
+@if (Model.OobList != null)
+{
+    <table hidden hx-swap-oob="outerHTML:#expense-list">
+        @await Html.PartialAsync("_Tbody", Model.OobList)
+    </table>
+}
