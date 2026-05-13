@@ -4,6 +4,15 @@ estudo comparativo de 5 backends servindo o mesmo aplicativo de despesas via htm
 compartilhando um unico banco sqlite. objetivo: comparar produtividade, simplicidade
 de codigo e curva de aprendizado dos 5 stacks pra app simples server-driven com htmx.
 
+## status
+
+todas as 5 implementacoes estao **prontas e mergeadas em `main`**. cada uma
+passou smoke test (HTTP 200 com HTML valido: `<form>`, tabela, hint, pico CSS,
+htmx) e compartilha o mesmo `shared/expenses.db`. cada stack tem seu proprio
+`README.md` na subpasta com detalhes de install/run.
+
+branches `feat/<stack>` preservadas no remoto pra diff/historico isolado.
+
 ## stacks comparados
 
 | stack | tecnologias | porta |
@@ -11,18 +20,39 @@ de codigo e curva de aprendizado dos 5 stacks pra app simples server-driven com 
 | .net | razor pages + ef core + htmx + htmx.taghelpers | 5001 |
 | go | net/http + html/template + database/sql + modernc.org/sqlite | 5002 |
 | python | fastapi + jinja2 + sqlite3 | 5003 |
-| node | hono + jsx + better-sqlite3 | 5004 |
+| node | hono + jsx + better-sqlite3 (via node + tsx) | 5004 |
 | rust | axum + askama + rusqlite | 5005 |
 
 ## como rodar
 
-cada subpasta tem seu proprio readme com o comando especifico. todas leem/escrevem
-em `shared/expenses.db` (criado no primeiro start a partir de `shared/schema.sql`).
+todas as stacks leem/escrevem em `shared/expenses.db` (criado no primeiro start
+a partir de `shared/schema.sql`).
 
-**rodar uma por vez** (sqlite com wal aguenta, mas pra evitar lock contention durante
-o estudo a recomendacao e ligar apenas um servidor de cada vez).
+**rodar uma por vez** (sqlite com WAL aguenta multipla leitura, mas pra evitar
+lock contention durante o estudo a recomendacao e ligar apenas um servidor de
+cada vez). use Ctrl+C pra parar antes de subir o proximo.
 
-acessar no browser na porta correspondente da tabela acima.
+a partir da raiz do repositorio:
+
+```powershell
+# .net  ->  http://localhost:5001
+cd dotnet; dotnet run
+
+# go  ->  http://localhost:5002
+cd go; go run .
+
+# python (com uv)  ->  http://localhost:5003
+cd python; uv run uvicorn main:app --port 5003
+
+# node  ->  http://localhost:5004
+# IMPORTANTE: no windows, use Node + tsx (NAO bun).
+# bun 1.1.x segfalha ao carregar better-sqlite3 no windows
+# (incompatibilidade do dlopen do bun com o N-API binding).
+cd node; npx tsx server.tsx
+
+# rust  ->  http://localhost:5005
+cd rust; cargo run
+```
 
 ## como comparar
 
@@ -59,7 +89,8 @@ o stack. fluxo recomendado:
 
 ### entregavel da comparacao
 
-ao fim das 5 implementacoes, escrever um `COMPARISON.md` na raiz com:
+apos rodar e exercitar manualmente as 5 stacks, escrever um `COMPARISON.md`
+na raiz com:
 
 - tabela quantitativa (loc, arquivos, deps, tempos)
 - impressoes qualitativas por stack (o que foi facil, o que foi chato)
