@@ -334,3 +334,41 @@ func currentPageFromRequest(r *http.Request) int {
 	}
 	return 1
 }
+
+// handleZerarExpense serve POST /expenses/{id}/zerar. Seta valor=0 e devolve
+// form re-renderizado (zerado) + tbody atualizado via hx-swap-oob.
+func (s *server) handleZerarExpense(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("id")
+	id := parseInt64(idStr)
+	if id <= 0 {
+		http.Error(w, "id invalido", http.StatusBadRequest)
+		return
+	}
+	if err := zerarExpense(s.db, id); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	page := currentPageFromRequest(r)
+	formVM, err := s.buildFormVM(nil, "", nil, false)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	listVM, err := s.buildListVM(page, true)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("HX-Trigger", "itemZeroed")
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	if err := s.tmpls.ExecuteTemplate(w, "form", formVM); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := s.tmpls.ExecuteTemplate(w, "list", listVM); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
