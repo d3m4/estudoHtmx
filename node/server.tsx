@@ -159,6 +159,30 @@ app.post("/expenses", async (c) => {
   );
 });
 
+// POST /expenses/:id/zerar  -> seta valor=0, retorna form + tbody oob
+app.post("/expenses/:id/zerar", (c) => {
+  const id = parseInt(c.req.param("id"), 10);
+  if (!Number.isFinite(id)) {
+    return c.text("id invalido", 400);
+  }
+  const exp = getExpenseById(id);
+  if (!exp) {
+    return c.text("nao encontrado", 404);
+  }
+  zerarExpense(id);
+
+  const targetPage = pageOfId(id);
+  const { rows } = listExpenses(targetPage);
+
+  c.header("HX-Trigger", "itemZerado");
+  return c.html(
+    <>
+      <Form state={emptyFormState()} totalContext={sumOfAll()} />
+      <TbodyOob rows={rows} />
+    </>
+  );
+});
+
 const port = Number(process.env.PORT ?? 5004);
 console.log(`[node] servidor escutando em http://localhost:${port}`);
 export default { port, fetch: app.fetch };
