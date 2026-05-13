@@ -1,0 +1,72 @@
+@model EstudoHtmx.Pages.Shared.FormModel
+@{
+    var idValue = Model.Id.HasValue ? Model.Id.Value.ToString() : "";
+    var isEdit = Model.Id.HasValue;
+}
+<form id="expense-form"
+      hx-post="/expenses"
+      hx-target="#expense-form"
+      hx-swap="outerHTML">
+    <input type="hidden" id="expense-id" name="id" value="@idValue" />
+
+    <label for="nome">
+        nome
+        <input type="text"
+               id="nome"
+               name="nome"
+               value="@Model.Nome"
+               aria-invalid="@(Model.ErroNome != null ? "true" : null)"
+               required />
+        @if (Model.ErroNome != null)
+        {
+            <small class="error" style="color: var(--pico-color-red-500);">
+                @Model.ErroNome
+            </small>
+        }
+    </label>
+
+    <label for="valor">
+        valor
+        <input type="text"
+               id="valor"
+               name="valor"
+               value="@Model.ValorRaw"
+               aria-invalid="@(Model.ErroValor != null ? "true" : null)"
+               required />
+        <small class="hint">ex: 100, -50, 1234,56 ou =(50/2)+10</small>
+        @if (Model.ErroValor != null)
+        {
+            <small class="error" style="color: var(--pico-color-red-500);">
+                @Model.ErroValor
+            </small>
+        }
+    </label>
+
+    <label for="total_acumulado">
+        total acumulado
+        @await Html.PartialAsync("_TotalContext",
+            new EstudoHtmx.Pages.Shared.TotalContextModel
+            {
+                ExcludingId = Model.Id,
+                Total = Model.TotalContexto
+            })
+    </label>
+
+    <label for="descricao">
+        descricao
+        <textarea id="descricao" name="descricao" rows="2">@Model.Descricao</textarea>
+    </label>
+
+    <div role="group">
+        <button type="submit">salvar</button>
+        <button type="button"
+                class="secondary"
+                hx-get="/expenses/form"
+                hx-target="#expense-form"
+                hx-swap="outerHTML">cancelar</button>
+    </div>
+    @if (isEdit)
+    {
+        <p><small>editando id @idValue</small></p>
+    }
+</form>

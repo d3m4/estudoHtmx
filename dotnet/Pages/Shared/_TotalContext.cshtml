@@ -1,0 +1,14 @@
+@model EstudoHtmx.Pages.Shared.TotalContextModel
+@{
+    var idAttr = Model.ExcludingId.HasValue ? Model.ExcludingId.Value.ToString() : "";
+}
+<input id="total_acumulado"
+       name="total_acumulado"
+       type="text"
+       readonly
+       value="@EstudoHtmx.Services.CurrencyFormatter.Brl(Model.Total)"
+       data-excluding-id="@idAttr"
+       hx-get="/expenses/total-context?excluding_id=@idAttr"
+       hx-trigger="focusout from:#expense-form input delay:300ms, focusout from:#expense-form textarea delay:300ms"
+       hx-target="this"
+       hx-swap="outerHTML" />
