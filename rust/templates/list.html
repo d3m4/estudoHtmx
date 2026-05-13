@@ -1,0 +1,72 @@
+<table id="expense-table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>nome</th>
+      <th>valor</th>
+      <th>total acumulado</th>
+      <th>descricao</th>
+      <th>acoes</th>
+    </tr>
+  </thead>
+  <tbody id="expense-list" {% if oob %}hx-swap-oob="true"{% endif %}>
+    {% if items.is_empty() %}
+      <tr><td colspan="6"><em>nenhuma despesa cadastrada</em></td></tr>
+    {% else %}
+      {% for it in items %}
+      <tr>
+        <td>{{ it.id }}</td>
+        <td>{{ it.nome }}</td>
+        <td class="{% if it.valor < 0.0 %}neg{% endif %}">{{ crate::format::brl(it.valor) }}</td>
+        <td class="{% if it.total_acumulado < 0.0 %}neg{% endif %}">{{ crate::format::brl(it.total_acumulado) }}</td>
+        <td><span class="truncate" title="{{ it.descricao }}">{{ it.descricao }}</span></td>
+        <td class="actions">
+          <button type="button"
+                  hx-get="/expenses/form?id={{ it.id }}"
+                  hx-target="#expense-form"
+                  hx-swap="outerHTML"
+                  aria-label="editar">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button type="button" class="secondary"
+                  hx-post="/expenses/{{ it.id }}/zerar"
+                  hx-confirm="Zerar este item?"
+                  hx-target="#expense-form"
+                  hx-swap="outerHTML"
+                  aria-label="zerar">
+            <i class="bi bi-arrow-counterclockwise"></i>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+
+<nav class="pagination" aria-label="paginacao">
+  <button type="button"
+          {% if page <= 1 %}disabled{% endif %}
+          hx-get="/expenses?page=1"
+          hx-target="#list-section"
+          hx-swap="innerHTML"
+          aria-label="primeira">&lt;&lt;</button>
+  <button type="button"
+          {% if page <= 1 %}disabled{% endif %}
+          hx-get="/expenses?page={{ page - 1 }}"
+          hx-target="#list-section"
+          hx-swap="innerHTML"
+          aria-label="anterior">&lt;</button>
+  <span>pagina {{ page }} de {{ total_pages }}</span>
+  <button type="button"
+          {% if page >= total_pages %}disabled{% endif %}
+          hx-get="/expenses?page={{ page + 1 }}"
+          hx-target="#list-section"
+          hx-swap="innerHTML"
+          aria-label="proxima">&gt;</button>
+  <button type="button"
+          {% if page >= total_pages %}disabled{% endif %}
+          hx-get="/expenses?page={{ total_pages }}"
+          hx-target="#list-section"
+          hx-swap="innerHTML"
+          aria-label="ultima">&gt;&gt;</button>
+</nav>

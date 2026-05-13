@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>estudoHtmx - rust</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <style>
+    .neg { color: var(--pico-color-red-500, #c0392b); }
+    .actions button { padding: 0.25rem 0.5rem; }
+    .truncate { max-width: 18ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: bottom; }
+    small.error { color: var(--pico-color-red-500, #c0392b); display: block; }
+    small.hint { color: var(--pico-muted-color, #6c757d); display: block; }
+    .pagination { display: flex; gap: .5rem; align-items: center; justify-content: center; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h1>despesas (rust)</h1>
+    <section id="form-section">
+      {{ form_html|safe }}
+    </section>
+    <section id="list-section">
+      {{ list_html|safe }}
+    </section>
+  </main>
+</body>
+</html>
